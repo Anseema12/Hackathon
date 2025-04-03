@@ -1,0 +1,238 @@
+//basic website
+<html>
+  <head>
+    <title>Farmers' Market</title>
+    <style>
+      body { font-family: Arial; text-align: center; }
+      h1 { color: green; }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to Farmer's Market</h1>
+    <p>Fresh produce direct from farmers!</p>
+    <button onclick="sayHello()">Click Me</button>
+<script>
+      function sayHello() {
+        alert("Thanks for supporting local farmers!");
+      }
+    </script>
+ </body>
+</html>
+
+
+//Home page
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmers' Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Farmers' Market</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Fresh Produce Direct from Farmers!</h2>
+        <p>Buy directly from local farmers and get the freshest products.</p>
+        <button onclick="explore()">Explore Products</button>
+    </section>
+
+    <script>
+        function explore() {
+            alert("Products page coming soon!");
+        }
+    </script>
+</body>
+</html>
+
+//CSS code for home page
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
+header {
+    background-color: green;
+    color: white;
+    padding: 15px;
+}
+nav a {
+    color: white;
+    margin: 10px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+section {
+    margin-top: 50px;
+}
+
+button {
+    background-color: orange;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+
+// Login page
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Farmers' Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+<h1>Farmers' Market</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Login</h2>
+        <form>
+            <label>Email:</label>
+            <input type="email" required>
+            <br>
+            <label>Password:</label>
+            <input type="password" required>
+            <br>
+            <button type="submit">Login</button>
+        </form>
+    </section>
+</body>
+</html>
+
+//javascirpt code to be added before <body>
+<script>
+    document.querySelector("form").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent page refresh
+        
+        let email = document.querySelector("input[type='email']").value;
+        let password = document.querySelector("input[type='password']").value;
+        
+        if (email === "test@gmail.com" && password === "1234") {
+            alert("Login successful!");
+            window.location.href = "index.html"; // Redirect to homepage
+        } else {
+            alert("Invalid email or password!");
+        }
+    });
+</script>
+
+// Adding the Signup Page
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Farmers' Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Farmers' Market</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Create an Account</h2>
+        <form id="registerForm">
+            <label>Full Name:</label>
+            <input type="text" required>
+            <br>
+<label>Email:</label>
+            <input type="email" required>
+            <br>
+            <label>Password:</label>
+            <input type="password" required>
+            <br>
+            <button type="submit">Register</button>
+        </form>
+    </section>
+
+    <script>
+        document.querySelector("#registerForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            
+            let name = document.querySelector("input[type='text']").value;
+            let email = document.querySelector("input[type='email']").value;
+            let password = document.querySelector("input[type='password']").value;
+            // Save user data (this will later be connected to a database)
+            localStorage.setItem("userEmail", email);
+            localStorage.setItem("userPassword", password);
+            
+            alert("Registration successful! Please login.");
+            window.location.href = "login.html"; // Redirect to login page
+        });
+    </script>
+</body>
+</html>
+
+//Create a Products page
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmers' Market - Products</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Farmers' Market</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </nav>
+</header>
+
+    <section>
+        <h2>Available Products</h2>
+        <ul id="productList"></ul>
+    </section>
+
+    <script>
+        // Sample product list (this will later come from a database)
+        let products = [
+            { name: "Fresh Tomatoes", price: 5 },
+            { name: "Organic Apples", price: 8 },
+            { name: "Farm Eggs", price: 3 }
+        ];
+let productList = document.getElementById("productList");
+        products.forEach(product => {
+            let li = document.createElement("li");
+            li.innerHTML = ${product.name} - $${product.price} <button onclick="buy()">Buy</button>;
+            productList.appendChild(li);
+        });
+
+        function buy() {
+            alert("Purchase successful!");
+        }
+    </script>
+</body>
+</html>
