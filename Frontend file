@@ -236,3 +236,508 @@ let productList = document.getElementById("productList");
     </script>
 </body>
 </html>
+
+
+Backend
+
+
+//Installing required packages (mongoose,cors and dotenv)
+npm install express mongoose cors dotenv
+
+//Creating a server
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+app.get("/", (req, res) => {
+    res.send("Backend is running...");
+});
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(Server running on port ${PORT});
+});
+
+//Connecting MongoDB to Backend(in case we used MongoDB as database)
+
+MONGO_URI=mongodb+srv://yourUsername:yourPassword@cluster.mongodb.net/?retryWrites=true&w=majority
+PORT=5000
+Update server.js to connect MongoDB:
+
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
+
+const app = express();
+app.use(express.json());
+app.use(cors());
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB");
+}).catch(err => console.log(err));
+app.get("/", (req, res) => {
+    res.send("Backend is running...");
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(Server running on port ${PORT});
+});
+
+//For storing users in Database we'll have to create models
+
+//create a user model
+const mongoose = require("mongoose");
+
+const UserSchema = new mongoose.Schema({
+    name: String,
+    email: { type: String, unique: true },
+    password: String
+});
+
+module.exports = mongoose.model("User", UserSchema);
+
+//Create Signup Route
+
+const express = require("express");
+const User = require("../models/User");
+const router = express.Router();
+
+// Register a user
+router.post("/register", async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+        const newUser = new User({ name, email, password });
+        await newUser.save();
+        res.status(201).json({ message: "User registered successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Registration failed" });
+    }
+});
+
+module.exports = router;
+
+//Connect Routes to Server
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+
+Restart the server:
+node server.js
+
+//Connecting Signup Form to Backend
+(to update register.html to send data to the backend)
+
+Replace the <script> section with:
+
+<script>
+    document.querySelector("#registerForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
+        
+        let name = document.querySelector("input[type='text']").value;
+        let email = document.querySelector("input[type='email']").value;
+        let password = document.querySelector("input[type='password']").value;
+
+        let response = await fetch("http://localhost:5000/api/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password })
+        });
+
+        let result = await response.json();
+        if (response.status === 201) {
+            alert("Registration successful!");
+            window.location.href = "login.html";
+        } else {
+            alert("Registration failed!");
+        }
+    });
+</script>
+
+//Creating a login API
+
+// Login a user
+router.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user || user.password !== password) {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        res.json({ message: "Login successful!" });
+    } catch (error) {
+        res.status(500).json({ error: "Login failed" });
+    }
+});
+
+Restart the server:
+node server.js
+
+//Connecting Login Form to Backend
+
+(to update login.html to send data to the backend)
+
+Replace the <script> section with:
+<script>
+    document.querySelector("form").addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        let email = document.querySelector("input[type='email']").value;
+        let password = document.querySelector("input[type='password']").value;
+
+        let response = await fetch("http://localhost:5000/api/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+        });
+
+        let result = await response.json();
+        if (response.status === 200) {
+            alert("Login successful!");
+            window.location.href = "index.html";
+        } else {
+            alert("Invalid credentials!");
+        }
+    });
+</script>
+
+//Creating the Product Model(to store products in MongoB)
+
+STEP 15: Creating the Product Model
+const mongoose = require("mongoose");
+
+const ProductSchema = new mongoose.Schema({
+    name: String,
+    price: Number,
+    description: String,
+    image: String, // URL to product image
+    farmerEmail: String // Email of the farmer who added the product
+});
+
+module.exports = mongoose.model("Product", ProductSchema);
+
+//Creating API to Add Products
+(Farmers should be able to add products to the database)
+
+
+const express = require("express");
+const Product = require("../models/Product");
+const router = express.Router();
+
+// Add a new product
+router.post("/add", async (req, res) => {
+    try {
+        const { name, price, description, image, farmerEmail } = req.body;
+        const newProduct = new Product({ name, price, description, image, farmerEmail });
+        await newProduct.save();
+        res.status(201).json({ message: "Product added successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to add product" });
+    }
+});
+
+// Get all products
+router.get("/", async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch products" });
+    }
+});
+
+module.exports = router;
+
+//Connect Routes to Backend
+
+const productRoutes = require("./routes/productRoutes");
+app.use("/api/products", productRoutes);
+
+Restart the server:
+
+node server.js
+
+//Creating "Add Product" Page
+Farmers need a page to add products.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Farmers' Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Farmers' Market</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="add-product.html">Add Product</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Add a New Product</h2>
+        <form id="addProductForm">
+            <label>Product Name:</label>
+            <input type="text" id="name" required>
+            <br>
+            <label>Price:</label>
+            <input type="number" id="price" required>
+            <br>
+            <label>Description:</label>
+            <textarea id="description" required></textarea>
+            <br>
+            <label>Image URL:</label>
+            <input type="text" id="image" required>
+            <br>
+            <button type="submit">Add Product</button>
+        </form>
+    </section>
+
+    <script>
+        document.querySelector("#addProductForm").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            let name = document.getElementById("name").value;
+            let price = document.getElementById("price").value;
+            let description = document.getElementById("description").value;
+            let image = document.getElementById("image").value;
+            let farmerEmail = localStorage.getItem("userEmail"); // Get logged-in user email
+
+            let response = await fetch("http://localhost:5000/api/products/add", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, price, description, image, farmerEmail })
+            });
+
+            let result = await response.json();
+            if (response.status === 201) {
+                alert("Product added successfully!");
+                window.location.href = "products.html";
+            } else {
+                alert("Failed to add product");
+            }
+        });
+    </script>
+</body>
+</html>
+
+//Displaying Products on Website
+(to fetch and display products)
+
+Replace the <script> section with:
+
+<script>
+    async function fetchProducts() {
+        let response = await fetch("http://localhost:5000/api/products");
+        let products = await response.json();
+        let productList = document.getElementById("productList");
+
+        productList.innerHTML = ""; // Clear list before adding new items
+
+        products.forEach(product => {
+            let li = document.createElement("li");
+            li.innerHTML = `
+                <img src="${product.image}" width="100">
+                <strong>${product.name}</strong> - $${product.price} 
+                <p>${product.description}</p>
+                <button onclick="buy('${product._id}')">Buy</button>
+            `;
+            productList.appendChild(li);
+        });
+    }
+
+    async function buy(productId) {
+        alert("Purchase feature coming soon!");
+    }
+
+    fetchProducts();
+</script>
+
+// Creating an Orders Model
+(to store orders in MongoDB when a consumer buys a product)
+\
+const mongoose = require("mongoose");
+
+const OrderSchema = new mongoose.Schema({
+    productId: String,
+    productName: String,
+    buyerEmail: String,
+    sellerEmail: String,
+    price: Number,
+    status: { type: String, default: "Pending" }
+});
+
+module.exports = mongoose.model("Order", OrderSchema);
+
+//Creating an Orders Model
+(to store orders in MongoDB when a consumer buys a product)
+
+const mongoose = require("mongoose");
+
+const OrderSchema = new mongoose.Schema({
+    productId: String,
+    productName: String,
+    buyerEmail: String,
+    sellerEmail: String,
+    price: Number,
+    status: { type: String, default: "Pending" }
+});
+
+module.exports = mongoose.model("Order", OrderSchema);
+
+
+//Connect Orders to Backend
+
+const orderRoutes = require("./routes/orderRoutes");
+app.use("/api/orders", orderRoutes);
+
+Restart the server:
+node server.js
+
+//Enabling "Buy Now" Button (to update html code for prducts)
+
+Replace the <script> section with:
+
+<script>
+    async function fetchProducts() {
+        let response = await fetch("http://localhost:5000/api/products");
+        let products = await response.json();
+        let productList = document.getElementById("productList");
+
+        productList.innerHTML = ""; // Clear previous data
+
+        products.forEach(product => {
+            let li = document.createElement("li");
+            li.innerHTML = `
+                <img src="${product.image}" width="100">
+                <strong>${product.name}</strong> - $${product.price} 
+                <p>${product.description}</p>
+                <button onclick="buy('${product._id}')">Buy</button>
+            `;
+            productList.appendChild(li);
+        });
+    }
+
+    async function buy(productId) {
+        let buyerEmail = localStorage.getItem("userEmail"); // Get logged-in user email
+        if (!buyerEmail) {
+            alert("Please log in to buy!");
+            return;
+        }
+
+        let response = await fetch("http://localhost:5000/api/orders/buy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productId, buyerEmail })
+        });
+
+        let result = await response.json();
+        if (response.status === 201) {
+            alert("Purchase successful!");
+        } else {
+            alert("Purchase failed!");
+        }
+    }
+
+    fetchProducts();
+</script>
+
+//Displaying Orders
+Consumers should be able to see their orders.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - Farmers' Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>My Orders</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="products.html">Products</a>
+            <a href="orders.html">My Orders</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Your Orders</h2>
+        <ul id="orderList"></ul>
+    </section>
+
+    <script>
+        async function fetchOrders() {
+            let userEmail = localStorage.getItem("userEmail"); // Get logged-in user email
+            if (!userEmail) {
+                alert("Please log in to see orders!");
+                return;
+            }
+
+            let response = await fetch(http://localhost:5000/api/orders/${userEmail});
+            let orders = await response.json();
+            let orderList = document.getElementById("orderList");
+
+            orderList.innerHTML = ""; // Clear previous data
+
+            orders.forEach(order => {
+                let li = document.createElement("li");
+                li.innerHTML = `
+                    <strong>${order.productName}</strong> - $${order.price} 
+                    <p>Status: ${order.status}</p>
+                `;
+                orderList.appendChild(li);
+            });
+        }
+
+        fetchOrders();
+    </script>
+</body>
+</html>
+
+ //Creating "Manage Products" API
+(Farmers should be able to edit and delete their products)
+
+// Update a product
+router.put("/update/:id", async (req, res) => {
+    try {
+        const { name, price, description, image } = req.body;
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            { name, price, description, image },
+            { new: true }
+        );
+        res.json(updatedProduct);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update product" });
+    }
+});
+
+// Delete a product
+router.delete("/delete/:id", async (req, res) => {
+    try {
+        await Product.findByIdAndDelete(req.params.id);
+        res.json({ message: "Product deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to delete product" });
+    }
+});
+
