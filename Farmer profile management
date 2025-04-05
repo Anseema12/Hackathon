@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmer Profile Setup</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --secondary: #f9a825;
+            --light: #f1f8e9;
+            --dark: #1b5e20;
+            --error: #c62828;
+            --success: #2e7d32;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 25px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #f57f17;
+        }
+        
+        .voice-control {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+        }
+        
+        .voice-btn {
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .voice-btn i {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .voice-status {
+            flex-grow: 1;
+        }
+        
+        .language-selector {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            border-radius: 4px;
+            width: 25%;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .step.active .step-number {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 14px;
+            text-align: center;
+        }
+        
+        .map-placeholder {
+            height: 200px;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .location-status {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .success-message {
+            color: var(--success);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-container {
+                padding: 15px;
+            }
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Farmer Profile Setup</h1>
+        </header>
+        
+        <div class="form-container">
+            <div class="language-selector">
+                <select id="language-select" onchange="changeLanguage()">
+                    <option value="en">English</option>
+                    <option value="es">Español</option>
+                    <option value="hi">हिंदी</option>
+                    <option value="fr">Français</option>
+                    <option value="sw">Kiswahili</option>
+                </select>
+            </div>
+            
+            <div class="voice-control">
+                <button class="voice-btn" id="voice-control-btn">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div class="voice-status">
+                    <p id="voice-prompt">Press the microphone and say "Start" to begin voice control</p>
+                    <p id="voice-feedback" class="success-message"></p>
+                </div>
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Farm Details</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Products</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Complete</div>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            
+            <form id="farmer-profile-form">
+                <!-- Step 1: Basic Information -->
+                <div class="form-section" id="step-1">
+                    <h2>Basic Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address (Optional)</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 2: Farm Details -->
+                <div class="form-section" id="step-2" style="display: none;">
+                    <h2>Farm Details</h2>
+                    
+                    <div class="form-group">
+                        <label for="farm-name">Farm Name</label>
+                        <input type="text" id="farm-name" name="farm-name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="farm-location">Farm Location</label>
+                        <div class="map-placeholder">
+                            <p>Map will be displayed here</p>
+                        </div>
+                        <p class="location-status">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            <span id="location-text">No location selected</span>
+                        </p>
+                        <button type="button" class="btn btn-secondary" onclick="getLocation()">
+                            <i class="fas fa-crosshairs"></i> Use Current Location
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="farm-size">Farm Size (in acres)</label>
+                        <input type="number" id="farm-size" name="farm-size" min="0" step="0.1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn" onclick="nextStep()">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Step 3: Products -->
+                <div class="form-section" id="step-3" style="display: none;">
+                    <h2>Products</h2>
+                    
+                    <div class="form-group">
+                        <label>Product Categories (Select all that apply)</label>
+                        <div>
+                            <input type="checkbox" id="vegetables" name="product-category" value="vegetables">
+                            <label for="vegetables">Vegetables</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="fruits" name="product-category" value="fruits">
+                            <label for="fruits">Fruits</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="grains" name="product-category" value="grains">
+                            <label for="grains">Grains</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="dairy" name="product-category" value="dairy">
+                            <label for="dairy">Dairy</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="livestock" name="product-category" value="livestock">
+                            <label for="livestock">Livestock</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="other" name="product-category" value="other">
+                            <label for="other">Other</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="farming-method">Farming Method</label>
+                        <select id="farming-method" name="farming-method" required>
+                            <option value="">Select a farming method</option>
+                            <option value="conventional">Conventional</option>
+                            <option value="organic">Organic</option>
+                            <option value="natural">Natural Farming</option>
+                            <option value="hydroponics">Hydroponics</option>
+                            <option value="permaculture">Permaculture</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="certifications">Certifications (if any)</label>
+                        <input type="text" id="certifications" name="certifications">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn" onclick="submitForm()">Submit</button>
+                    </div>
+                </div>
+                
+                <!-- Step 4: Completion -->
+                <div class="form-section" id="step-4" style="display: none;">
+                    <div style="text-align: center; padding: 30px 0;">
+                        <i class="fas fa-check-circle" style="font-size: 64px; color: var(--success);"></i>
+                        <h2>Profile Created Successfully!</h2>
+                        <p>Your farmer profile has been created. Now you can start managing your inventory.</p>
+                        <div class="form-group" style="margin-top: 30px;">
+                            <button type="button" class="btn" onclick="goToInventory()">Go to Inventory Management</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Current step tracking
+        let currentStep = 1;
+        
+        // Voice recognition setup
+        let recognition;
+        let isListening = false;
+        const voiceBtn = document.getElementById('voice-control-btn');
+        const voiceFeedback = document.getElementById('voice-feedback');
+        const voicePrompt = document.getElementById('voice-prompt');
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                
+                // Get selected language
+                const langSelect = document.getElementById('language-select');
+                const language = langSelect.value;
+                
+                // Map language codes to recognition language codes
+                const languageMap = {
+                    'en': 'en-US',
+                    'es': 'es-ES',
+                    'hi': 'hi-IN',
+                    'fr': 'fr-FR',
+                    'sw': 'sw-KE'
+                };
+                
+                recognition.lang = languageMap[language] || 'en-US';
+                
+                recognition.onstart = function() {
+                    isListening = true;
+                    voiceBtn.style.backgroundColor = '#c62828';
+                    voiceBtn.innerHTML = '<i class="fas fa-stop"></i>';
+                    voicePrompt.textContent = "Listening...";
+                };
+                
+                recognition.onend = function() {
+                    isListening = false;
+                    voiceBtn.style.backgroundColor = '';
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                    voicePrompt.textContent = "Press the microphone and speak";
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript.toLowerCase();
+                    voiceFeedback.textContent = You said: "${transcript}";
+                    processVoiceCommand(transcript);
+                };
+                
+                recognition.onerror = function(event) {
+                    voiceFeedback.textContent = Error: ${event.error};
+                    isListening = false;
+                    voiceBtn.style.backgroundColor = '';
+                    voiceBtn.innerHTML = '<i class="fas fa-microphone"></i>';
+                };
+                
+                return true;
+            } else {
+                voiceFeedback.textContent = "Speech recognition not supported in this browser.";
+                return false;
+            }
+        }
+        
+        // Process voice commands
+        function processVoiceCommand(command) {
+            // Navigation commands
+            if (command.includes('next') || command.includes('continue')) {
+                nextStep();
+            } else if (command.includes('previous') || command.includes('back')) {
+                prevStep();
+            } else if (command.includes('submit') || command.includes('finish')) {
+                submitForm();
+            }
+            
+            // Field filling commands - Step 1
+            else if (command.includes('name is') || command.includes('call me')) {
+                const nameMatch = command.match(/(?:name is|call me) (.+)/i);
+                if (nameMatch && nameMatch[1]) {
+                    document.getElementById('name').value = nameMatch[1].trim();
+                    voiceFeedback.textContent = Name set to: ${nameMatch[1].trim()};
+                }
+            } else if (command.includes('phone') || command.includes('number')) {
+                const phoneMatch = command.match(/(?:phone|number)[^\d]*(\d+)/i);
+                if (phoneMatch && phoneMatch[1]) {
+                    document.getElementById('phone').value = phoneMatch[1].trim();
+                    voiceFeedback.textContent = Phone set to: ${phoneMatch[1].trim()};
+                }
+            } else if (command.includes('email')) {
+                // Email commands would need more complex parsing
+                voiceFeedback.textContent = "For email, please type it manually for accuracy";
+            }
+            
+            // Step 2 commands
+            else if (command.includes('farm name') || command.includes('call my farm')) {
+                const farmNameMatch = command.match(/(?:farm name|call my farm) (.+)/i);
+                if (farmNameMatch && farmNameMatch[1]) {
+                    document.getElementById('farm-name').value = farmNameMatch[1].trim();
+                    voiceFeedback.textContent = Farm name set to: ${farmNameMatch[1].trim()};
+                }
+            } else if (command.includes('size') || command.includes('acres')) {
+                const sizeMatch = command.match(/(\d+(?:\.\d+)?)\s*(?:acres|acre)/i);
+                if (sizeMatch && sizeMatch[1]) {
+                    document.getElementById('farm-size').value = sizeMatch[1].trim();
+                    voiceFeedback.textContent = Farm size set to: ${sizeMatch[1].trim()} acres;
+                }
+            } else if (command.includes('location') || command.includes('gps')) {
+                getLocation();
+            }
+            
+            // Step 3 commands
+            else if (command.includes('grow') || command.includes('produce') || command.includes('sell')) {
+                // Check for produce types
+                const produceTypes = [
+                    { keyword: 'vegetable', id: 'vegetables' },
+                    { keyword: 'fruit', id: 'fruits' },
+                    { keyword: 'grain', id: 'grains' },
+                    { keyword: 'dairy', id: 'dairy' },
+                    { keyword: 'livestock', id: 'livestock' }
+                ];
+                
+                let found = false;
+                produceTypes.forEach(type => {
+                    if (command.includes(type.keyword)) {
+                        document.getElementById(type.id).checked = true;
+                        found = true;
+                    }
+                });
+                
+                if (found) {
+                    voiceFeedback.textContent = Product categories updated;
+                }
+            } else if (command.includes('organic')) {
+                document.getElementById('farming-method').value = 'organic';
+                voiceFeedback.textContent = "Farming method set to organic";
+            } else if (command.includes('conventional')) {
+                document.getElementById('farming-method').value = 'conventional';
+                voiceFeedback.textContent = "Farming method set to conventional";
+            } else if (command.includes('natural')) {
+                document.getElementById('farming-method').value = 'natural';
+                voiceFeedback.textContent = "Farming method set to natural farming";
+            } else if (command.includes('hydroponics')) {
+                document.getElementById('farming-method').value = 'hydroponics';
+                voiceFeedback.textContent = "Farming method set to hydroponics";
+            } else if (command.includes('permaculture')) {
+                document.getElementById('farming-method').value = 'permaculture';
+                voiceFeedback.textContent = "Farming method set to permaculture";
+            }
+            
+            // Help command
+            else if (command.includes('help')) {
+                voiceFeedback.textContent = "Available commands: next, previous, name is [your name], phone is [your number], etc.";
+            } else {
+                voiceFeedback.textContent = Command not recognized: "${command}";
+            }
+        }
+        
+        // Toggle voice recognition
+        voiceBtn.addEventListener('click', function() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    return;
+                }
+            }
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+        
+        // Change UI language
+        function changeLanguage() {
+            const language = document.getElementById('language-select').value;
+            // In a real implementation, this would load translations for the UI
+            
+            // Re-initialize speech recognition with new language
+            if (recognition) {
+                recognition.stop();
+                recognition = null;
+                initSpeechRecognition();
+            }
+            
+            // For demonstration purposes
+            const languageNames = {
+                'en': 'English',
+                'es': 'Spanish',
+                'hi': 'Hindi',
+                'fr': 'French',
+                'sw': 'Swahili'
+            };
+            
+            voiceFeedback.textContent = Language changed to ${languageNames[language]};
+        }
+        
+        // Get user's current location
+        function getLocation() {
+            if (navigator.geolocation) {
+                document.getElementById('location-text').textContent = "Detecting your location...";
+                
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        document.getElementById('location-text').innerHTML = 
+                            Location detected: ${lat.toFixed(6)}, ${lng.toFixed(6)};
+                        
+                        // In a real implementation, we would update the map and store coordinates
+                        voiceFeedback.textContent = "Location successfully captured";
+                    },
+                    function(error) {
+                        document.getElementById('location-text').textContent = 
+                            "Unable to retrieve your location. Please try again or enter manually.";
+                    }
+                );
+            } else {
+                document.getElementById('location-text').textContent = 
+                    "Geolocation is not supported by this browser.";
+            }
+        }
+        
+        // Navigation functions
+        function nextStep() {
+            if (currentStep < 4) {
+                document.getElementById(step-${currentStep}).style.display = 'none';
+                currentStep++;
+                document.getElementById(step-${currentStep}).style.display = 'block';
+                
+                // Update progress bar
+                document.querySelector('.progress').style.width = ${(currentStep / 4) * 100}%;
+                
+                // Update step indicators
+                document.querySelectorAll('.step').forEach((step, index) => {
+                    if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+                
+                voiceFeedback.textContent = Moved to step ${currentStep};
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(step-${currentStep}).style.display = 'none';
+                currentStep--;
+                document.getElementById(step-${currentStep}).style.display = 'block';
+                
+                // Update progress bar
+                document.querySelector('.progress').style.width = ${(currentStep / 4) * 100}%;
+                
+                // Update step indicators
+                document.querySelectorAll('.step').forEach((step, index) => {
+                    if (index + 1 === currentStep) {
+                        step.classList.add('active');
+                    } else {
+                        step.classList.remove('active');
+                    }
+                });
+                
+                voiceFeedback.textContent = Moved to step ${currentStep};
+            }
+        }
+        
+        function submitForm() {
+            // In a real implementation, we would validate and submit the form data
+            currentStep = 4;
+            
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            document.getElementById('step-4').style.display = 'block';
+            document.querySelector('.progress').style.width = '100%';
+            
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList
+                .remove('active');
+            });
+            
+            document.querySelectorAll('.step')[3].classList.add('active');
+            
+            voiceFeedback.textContent = "Profile successfully created!";
+        }
+        
+        function goToInventory() {
+            // Redirect to inventory management
+            window.location.href = 'inventory-management.html';
+        }
+        
+        // Initialize speech recognition
+        initSpeechRecognition();
+    </script>
+</body>
+</html>
