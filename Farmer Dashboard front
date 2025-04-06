@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FarmerConnect Dashboard</title>
+  <title>FarmConnect Dashboard</title>
   <style>
     :root {
       --primary: #4caf50;
@@ -137,6 +137,25 @@
       border-radius: 5px;
       cursor: pointer;
       outline: none;
+    }
+    
+    .user-profile {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 20px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .user-profile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
     
     .voice-control {
@@ -391,44 +410,6 @@
       color: var(--success);
     }
     
-    /* Voice Command Indicator */
-    .voice-indicator {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background-color: white;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      transition: all 0.3s;
-    }
-    
-    .voice-indicator i {
-      color: #aaa;
-      font-size: 1.5rem;
-    }
-    
-    .voice-indicator.active {
-      background-color: var(--primary);
-      transform: scale(1.1);
-    }
-    
-    .voice-indicator.active i {
-      color: white;
-      animation: wave 1.5s infinite;
-    }
-    
-    @keyframes wave {
-      0% { transform: scale(0.8); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(0.8); }
-    }
-    
     /* Voice Command Help Modal */
     .help-modal {
       position: fixed;
@@ -582,17 +563,13 @@
     <aside class="sidebar">
       <div class="logo">
         <img src="/api/placeholder/40/40" alt="FarmerConnect Logo">
-        <h1>FarmerConnect</h1>
+        <h1>FarmConnect</h1>
       </div>
       
       <nav>
         <div class="nav-item active" data-i18n="nav.dashboard">
           <i class="fas fa-th-large"></i>
           <span>Dashboard</span>
-        </div>
-        <div class="nav-item" data-i18n="nav.inventory">
-          <i class="fas fa-box"></i>
-          <span>Inventory</span>
         </div>
         <div class="nav-item" data-i18n="nav.orders">
           <i class="fas fa-shopping-cart"></i>
@@ -601,10 +578,6 @@
         <div class="nav-item" data-i18n="nav.customers">
           <i class="fas fa-users"></i>
           <span>Customers</span>
-        </div>
-        <div class="nav-item" data-i18n="nav.analytics">
-          <i class="fas fa-chart-bar"></i>
-          <span>Analytics</span>
         </div>
         <div class="nav-item" data-i18n="nav.messages">
           <i class="fas fa-comments"></i>
@@ -634,10 +607,15 @@
           <div class="language-selector">
             <select id="language-selector">
               <option value="en-US">English</option>
-              <option value="es-ES">Español</option>
               <option value="hi-IN">हिंदी</option>
-              <option value="fr-FR">Français</option>
+              <option value="mr-IN">मराठी</option>
+              <option value="gu-IN">ગુજરાતી</option>
+              <option value="ml-IN">मालवी</option>
             </select>
+          </div>
+          
+          <div class="user-profile">
+            <img src="/api/placeholder/40/40" alt="User Profile">
           </div>
           
           <div id="voice-activation" class="voice-control">
@@ -837,11 +815,6 @@
     </main>
   </div>
   
-  <!-- Voice Command Indicator -->
-  <div id="voice-indicator" class="voice-indicator">
-    <i class="fas fa-microphone"></i>
-  </div>
-  
   <!-- Voice Command Help Modal -->
   <div id="voice-command-help" class="help-modal">
     <div class="modal-content">
@@ -856,10 +829,6 @@
           <div class="command-item">
             <div class="command-phrase">"Go to Dashboard"</div>
             <div class="command-desc">Navigate to the dashboard page</div>
-          </div>
-          <div class="command-item">
-            <div class="command-phrase">"Go to Inventory"</div>
-            <div class="command-desc">Navigate to inventory management</div>
           </div>
           <div class="command-item">
             <div class="command-phrase">"Show Orders"</div>
@@ -921,7 +890,8 @@
           </div>
         </div>
       </div>
-    </div>
-  </div>
+    </div>
+  </div>
   
-</body></html>
+</body>
+</html>
