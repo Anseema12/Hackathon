@@ -20,28 +20,45 @@
     border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     width: 90%;
-    max-width: 400px;
+    max-width: 500px;
   }
   
-  .container h1 {
+  h1 {
     color: #2e7d32;
     margin-bottom: 10px;
   }
   
-  .container p {
+  p {
     color: #555;
     margin-bottom: 30px;
   }
   
-  .form-box h2 {
-    margin-bottom: 20px;
-    color: #333;
+  .btn, button {
+    background-color: #2e7d32;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .btn:hover, button:hover {
+    background-color: #1b5e20;
+  }
+  
+  .role-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
   }
   
   form {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin-top: 20px;
   }
   
   input, select {
@@ -50,18 +67,17 @@
     border: 1px solid #ccc;
   }
   
-  button {
-    padding: 12px;
-    background-color: #2e7d32;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.3s ease;
+  .hidden {
+    display: none;
   }
   
-  button:hover {
-    background-color: #1b5e20;
+  .back-btn {
+    margin-top: 20px;
+    background-color: #ccc;
+    color: #333;
+  }
+  
+  .back-btn:hover {
+    background-color: #aaa;
   }
   
