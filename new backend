@@ -1,0 +1,624 @@
+import React, { useState, useRef, useEffect } from 'react';
+import Sidebar, { NavItem } from '@/components/Sidebar';
+import TopBar from '@/components/TopBar';
+import VoiceCommandHelp from '@/components/VoiceCommandHelp';
+import DashboardSection from '@/components/sections/DashboardSection';
+import OrdersSection from '@/components/sections/OrdersSection';
+import CustomersSection from '@/components/sections/CustomersSection';
+import MessagesSection from '@/components/sections/MessagesSection';
+import SettingsSection from '@/components/sections/SettingsSection';
+import HelpSection from '@/components/sections/HelpSection';
+import MyProductsSection from '@/components/sections/MyProductsSection';
+import { toast } from '@/components/ui/use-toast';
+import { useLocalization } from '@/hooks/useLocalization';
+
+const Dashboard: React.FC = () => {
+  const [activeSection, setActiveSection] = useState('dashboard');
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [showVoiceHelp, setShowVoiceHelp] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const ordersRef = useRef<HTMLDivElement>(null);
+  const customersRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const settingsRef = useRef<HTMLDivElement>(null);
+  const helpRef = useRef<HTMLDivElement>(null);
+  const myProductsRef = useRef<HTMLDivElement>(null);
+  
+  const { t, changeLanguage, currentLanguage } = useLocalization();
+  
+  // Updated the navItems order to include My Products before Orders
+  const navItems: NavItem[] = [
+    { id: 'dashboard', title: t('nav.dashboard'), icon: 'fas fa-th-large', path: '#dashboard' },
+    { id: 'my-products', title: t('nav.myProducts'), icon: 'fas fa-box', path: '#my-products' },
+    { id: 'orders', title: t('nav.orders'), icon: 'fas fa-shopping-cart', path: '#orders' },
+    { id: 'customers', title: t('nav.customers'), icon: 'fas fa-users', path: '#customers' },
+    { id: 'messages', title: t('nav.messages'), icon: 'fas fa-comments', path: '#messages' },
+    { id: 'settings', title: t('nav.settings'), icon: 'fas fa-cog', path: '#settings' },
+    { id: 'help', title: t('nav.help'), icon: 'fas fa-question-circle', path: '#help' }
+  ];
+  
+  // Handle search submit to show search results
+  const handleSearchSubmit = (query: string) => {
+    setSearchQuery(query);
+    if (query.trim().length > 0) {
+      setShowSearchResults(true);
+      toast({
+        title: t('search.searching'),
+        description: `"${query}"`,
+      });
+    } else {
+      setShowSearchResults(false);
+    }
+  };
+  
+  // ... keep existing code (handleVoiceActivation, checkVisibility, etc)
+
+  return (
+    <>
+      <div className="min-h-screen bg-gray-50 flex">
+        <Sidebar activeSection={activeSection} navItems={navItems} />
+        
+        <div className="ml-64 flex-1">
+          <div className="p-6">
+            <TopBar 
+              onVoiceActivation={handleVoiceActivation} 
+              isVoiceActive={isVoiceActive} 
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              onSearchSubmit={handleSearchSubmit}
+            />
+            
+            {showSearchResults && searchQuery.trim() ? (
+              <div className="bg-white rounded-lg shadow-md p-5 mb-8">
+                <h2 className="text-xl font-bold mb-4">{t('search.results')} "{searchQuery}"</h2>
+                
+                <div id="my-products" className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">{t('nav.myProducts')}</h3>
+                  <MyProductsSection sectionRef={myProductsRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="orders" className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">{t('nav.orders')}</h3>
+                  <OrdersSection sectionRef={ordersRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="customers" className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">{t('nav.customers')}</h3>
+                  <CustomersSection sectionRef={customersRef} searchQuery={searchQuery} />
+                </div>
+              </div>
+            ) : (
+              <>
+                <div id="dashboard">
+                  <DashboardSection sectionRef={dashboardRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="my-products">
+                  <MyProductsSection sectionRef={myProductsRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="orders">
+                  <OrdersSection sectionRef={ordersRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="customers">
+                  <CustomersSection sectionRef={customersRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="messages">
+                  <MessagesSection sectionRef={messagesRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="settings">
+                  <SettingsSection sectionRef={settingsRef} searchQuery={searchQuery} />
+                </div>
+                
+                <div id="help">
+                  <HelpSection sectionRef={helpRef} searchQuery={searchQuery} />
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <VoiceCommandHelp 
+        isOpen={showVoiceHelp} 
+        onClose={() => setShowVoiceHelp(false)} 
+        commandGroups={commandGroups} 
+      />
+    </>
+  );
+};
+
+export default Dashboard;
+
+
+
+
+import React, { useState } from 'react';
+import { toast } from '@/components/ui/use-toast';
+import { useLocalization } from '@/hooks/useLocalization';
+
+interface TopBarProps {
+  onVoiceActivation: () => void;
+  isVoiceActive: boolean;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  onSearchSubmit: (query: string) => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ 
+  onVoiceActivation, 
+  isVoiceActive, 
+  searchQuery, 
+  setSearchQuery,
+  onSearchSubmit
+}) => {
+  const { t, changeLanguage, currentLanguage } = useLocalization();
+
+  const handleLanguageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newLanguage = e.target.value;
+    changeLanguage(newLanguage);
+    
+    toast({
+      title: t('language.changed'),
+      description: `${t('language.changedTo')} ${e.target.options[e.target.selectedIndex].text}`,
+    });
+  };
+
+  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      onSearchSubmit(searchQuery);
+    }
+  };
+
+  return (
+    <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center mb-8">
+      <div className="bg-white rounded-full shadow-md px-4 py-2 flex items-center w-full md:w-72 mb-4 md:mb-0">
+        <i className="fas fa-search text-gray-400 mr-2"></i>
+        <input 
+          type="text" 
+          placeholder={t('search.placeholder')}
+          className="border-none outline-none flex-1 text-sm"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleSearch}
+        />
+        <button
+          className="text-primary ml-2"
+          onClick={() => onSearchSubmit(searchQuery)}
+        >
+          <i className="fas fa-arrow-right"></i>
+        </button>
+      </div>
+      
+      <div className="flex items-center justify-between md:justify-end">
+        <div className="mr-5">
+          <select 
+            className="bg-white border border-gray-200 px-4 py-2 rounded-md cursor-pointer outline-none"
+            value={currentLanguage}
+            onChange={handleLanguageChange}
+          >
+            <option value="en-US">English</option>
+            <option value="hi-IN">हिंदी</option>
+            <option value="mr-IN">मराठी</option>
+            <option value="gu-IN">ગુજરાતી</option>
+            <option value="ml-IN">मालवी</option>
+          </select>
+        </div>
+        
+        <div 
+          className={`w-12 h-12 rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all ${
+            isVoiceActive 
+              ? "bg-danger animate-pulse" 
+              : "bg-primary hover:shadow-lg hover:-translate-y-0.5"
+          }`}
+          onClick={onVoiceActivation}
+        >
+          <i className="fas fa-microphone text-white"></i>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TopBar;
+
+
+// English translations
+const en_US = {
+  nav: {
+    dashboard: 'Dashboard',
+    orders: 'Orders',
+    customers: 'Customers',
+    myProducts: 'My Products',
+    messages: 'Messages',
+    settings: 'Settings',
+    help: 'Help',
+  },
+  search: {
+    placeholder: 'Search products, orders, customers...',
+    searching: 'Searching for',
+    noResults: 'No results found',
+    results: 'Search Results',
+  },
+  language: {
+    changed: 'Language Changed',
+    changedTo: 'Interface language changed to',
+  },
+  voice: {
+    activated: 'Voice Command Activated',
+    deactivated: 'Voice Command Deactivated',
+    listening: 'Listening for voice commands...',
+    stopped: 'Voice recognition stopped.',
+    error: 'Voice Recognition Error',
+    notSupported: 'Voice recognition is not supported in your browser.',
+    navigating: 'Navigating to',
+    searching: 'Searching for',
+  },
+  stats: {
+    totalSales: 'Total Sales',
+    activeOrders: 'Active Orders',
+    products: 'Products',
+    customers: 'Customers',
+  },
+  products: {
+    title: 'My Products',
+    addNew: 'Add Product',
+    edit: 'Edit Product',
+    delete: 'Delete Product',
+    confirmDelete: 'Are you sure you want to delete this product?',
+    addSuccess: 'Product added successfully',
+    updateSuccess: 'Product updated successfully',
+    deleteSuccess: 'Product deleted successfully',
+    category: 'Category',
+    price: 'Price',
+    stock: 'Stock',
+    inStock: 'In Stock',
+    lowStock: 'Low Stock',
+    outOfStock: 'Out of Stock',
+    actions: 'Actions',
+    all: 'All Products',
+    vegetables: 'Vegetables',
+    fruits: 'Fruits',
+    grains: 'Grains',
+    dairy: 'Dairy',
+    other: 'Other',
+    table: {
+      product: 'Product',
+      category: 'Category',
+      price: 'Price',
+      stock: 'Stock',
+      actions: 'Actions',
+    },
+    form: {
+      name: 'Product Name',
+      category: 'Category',
+      price: 'Price',
+      stock: 'Stock Amount',
+      selectCategory: 'Select Category',
+      save: 'Save Product',
+      cancel: 'Cancel'
+    }
+  },
+  orders: {
+    title: 'Orders',
+    recent: 'Recent Orders',
+    all: 'All Orders',
+    viewAll: 'View All',
+    pending: 'Pending',
+    shipped: 'Shipped',
+    delivered: 'Delivered',
+    cancelled: 'Cancelled',
+    status: 'Status'
+  },
+  customers: {
+    title: 'Customers',
+    total: 'Total Customers',
+    new: 'New Customers',
+    returning: 'Returning Customers',
+    viewProfile: 'View Profile',
+  },
+  settings: {
+    language: 'Language Settings',
+    languageDescription: 'Choose your preferred language for the application interface and content.',
+    languageNote: 'Changing the language will translate all content, including product information, orders, and customer data.',
+    notifications: 'Notifications',
+    notificationsDescription: 'Manage how you receive updates and alerts.',
+    orderUpdates: 'Order Updates',
+    orderUpdatesDescription: 'Receive notifications when orders are placed, shipped, or delivered.',
+    stockAlerts: 'Stock Alerts',
+    stockAlertsDescription: 'Get notified when product inventory is running low.',
+    marketingMessages: 'Marketing Messages',
+    marketingMessagesDescription: 'Receive promotional updates and special offers.',
+    account: 'Account Settings',
+    accountDescription: 'Manage your account information and security settings.',
+    editProfile: 'Edit Profile',
+    changePassword: 'Change Password',
+    billingInformation: 'Billing Information',
+    logout: 'Logout',
+    comingSoon: 'Coming Soon',
+    featureNotAvailable: 'This feature will be available in a future update.',
+    attention: 'Attention',
+    logoutConfirmation: 'Are you sure you want to logout? Your session will be terminated.'
+  },
+  voiceHelp: {
+    title: 'Voice Commands',
+    navigation: 'Navigation Commands',
+    products: 'Product Commands',
+    orders: 'Order Commands',
+    general: 'General Commands',
+  },
+  voiceCommands: {
+    goToDashboard: '"Go to Dashboard"',
+    showOrders: '"Show Orders"',
+    openCustomers: '"Open Customers"',
+    goToMessages: '"Go to Messages"',
+    openSettings: '"Open Settings"',
+    showHelp: '"Show Help"',
+    addProduct: '"Add new product"',
+    updatePrice: '"Update price for [product]"',
+    updateStock: '"Update stock for [product]"',
+    showNewOrders: '"Show new orders"',
+    markOrderShipped: '"Mark order [ID] as shipped"',
+    findOrder: '"Find order [customer name]"',
+    switchLanguage: '"Switch to Hindi"',
+    search: '"Search for [keyword]"',
+    help: '"Help"',
+  },
+  voiceCommandDesc: {
+    goToDashboard: 'Navigate to the dashboard page',
+    showOrders: 'View your orders',
+    openCustomers: 'View your customer list',
+    goToMessages: 'Check your messages',
+    openSettings: 'Manage your account settings',
+    showHelp: 'View help and support options',
+    addProduct: 'Create a new product listing',
+    updatePrice: 'Change the price of a product',
+    updateStock: 'Update available quantity',
+    showNewOrders: 'Display recent orders',
+    markOrderShipped: 'Update order status',
+    findOrder: 'Search for customer orders',
+    switchLanguage: 'Change interface language',
+    search: 'Search across your account',
+    help: 'Show voice command guide',
+  },
+  indore: {
+    title: 'FarmConnect Indore',
+    description: 'Connecting local farmers with consumers in Indore',
+    specialty: 'Indore Specialty Items',
+    localMarkets: 'Local Farmer Markets',
+    popularProducts: 'Popular Products in Indore',
+    nearbyFarms: 'Nearby Farms',
+    organicCertified: 'Indore Organic Certified',
+    welcomeMessage: 'Welcome to FarmConnect Indore - Your platform for connecting with local farmers and getting fresh produce directly from farms to your table.',
+    marketSchedule: 'Farmer Market Schedule',
+    localEvents: 'Local Agricultural Events in Indore',
+    deliveryAreas: 'We deliver to all areas in Indore city',
+    supportLocal: 'Support local farmers in and around Indore'
+  }
+};
+
+export default en_US;
+
+
+import React, { useState } from 'react';
+import ProductTable from '@/components/ProductTable';
+import { Product } from '@/components/ProductTable';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from '@/components/ui/use-toast';
+import { useLocalization } from '@/hooks/useLocalization';
+
+interface MyProductsSectionProps {
+  sectionRef: React.RefObject<HTMLDivElement>;
+  searchQuery: string;
+}
+
+const MyProductsSection: React.FC<MyProductsSectionProps> = ({ sectionRef, searchQuery }) => {
+  const { t } = useLocalization();
+  const [products, setProducts] = useState<Product[]>([
+    {
+      id: 'p1',
+      name: 'Organic Tomatoes',
+      image: '/placeholder.svg',
+      category: 'Vegetables',
+      price: '₹40/kg',
+      stock: {
+        status: 'in-stock',
+        amount: '120kg'
+      }
+    },
+    {
+      id: 'p2',
+      name: 'Malwa Basmati Rice',
+      image: '/placeholder.svg',
+      category: 'Grains',
+      price: '₹90/kg',
+      stock: {
+        status: 'low-stock',
+        amount: '25kg'
+      }
+    },
+    {
+      id: 'p3',
+      name: 'Indore Langra Mangoes',
+      image: '/placeholder.svg',
+      category: 'Fruits',
+      price: '₹350/dozen',
+      stock: {
+        status: 'out-of-stock',
+        amount: '0'
+      }
+    },
+    {
+      id: 'p4',
+      name: 'Indore Wild Honey',
+      image: '/placeholder.svg',
+      category: 'Other',
+      price: '₹450/liter',
+      stock: {
+        status: 'in-stock',
+        amount: '15L'
+      }
+    },
+    {
+      id: 'p5',
+      name: 'Fresh Malwa Wheat',
+      image: '/placeholder.svg',
+      category: 'Grains',
+      price: '₹35/kg',
+      stock: {
+        status: 'in-stock',
+        amount: '500kg'
+      }
+    },
+    {
+      id: 'p6',
+      name: 'Indore Special Namkeen',
+      image: '/placeholder.svg',
+      category: 'Other',
+      price: '₹180/kg',
+      stock: {
+        status: 'in-stock',
+        amount: '50kg'
+      }
+    },
+    {
+      id: 'p7',
+      name: 'Indori Poha',
+      image: '/placeholder.svg',
+      category: 'Grains',
+      price: '₹60/kg',
+      stock: {
+        status: 'in-stock',
+        amount: '75kg'
+      }
+    },
+    {
+      id: 'p8',
+      name: 'Local Garlic',
+      image: '/placeholder.svg',
+      category: 'Vegetables',
+      price: '₹120/kg',
+      stock: {
+        status: 'in-stock',
+        amount: '30kg'
+      }
+    },
+    {
+      id: 'p9',
+      name: 'Malwa Organic Milk',
+      image: '/placeholder.svg',
+      category: 'Dairy',
+      price: '₹60/liter',
+      stock: {
+        status: 'in-stock',
+        amount: '50L'
+      }
+    }
+  ]);
+
+  // ... keep existing code (isDialogOpen, newProduct state, etc.)
+
+  return (
+    <div ref={sectionRef} className="min-h-screen pb-10">
+      <div className="flex flex-col md:flex-row justify-between items-start mb-6">
+        <div>
+          <h1 className="text-2xl font-bold mb-2">{t('products.title')}</h1>
+          <p className="text-gray-600">{t('indore.supportLocal')}</p>
+        </div>
+        <button 
+          className="bg-primary hover:bg-primary-hover text-white px-4 py-2 rounded-md flex items-center shadow-md transition-all mt-4 md:mt-0"
+          onClick={handleAddProduct}
+        >
+          <i className="fas fa-plus mr-2"></i>
+          <span>{t('products.addNew')}</span>
+        </button>
+      </div>
+      
+      <div className="mb-8">
+        <div className="flex justify-between items-center mb-5">
+          <h2 className="text-xl font-semibold">{t('products.all')}</h2>
+        </div>
+        
+        <ProductTable products={filteredProducts} />
+      </div>
+
+      {/* Add Product Dialog */}
+      // ... keep existing code (Dialog component)
+    </div>
+  );
+};
+
+export default MyProductsSection;
+
+
+
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+
+export type NavItem = {
+  id: string;
+  title: string;
+  icon: string;
+  path: string;
+};
+
+interface SidebarProps {
+  activeSection: string;
+  navItems: NavItem[];
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ activeSection, navItems }) => {
+  const navigate = useNavigate();
+
+  const handleNavClick = (path: string) => {
+    navigate(path);
+  };
+
+  return (
+    <aside className="bg-dark text-white w-64 p-5 flex flex-col h-screen fixed">
+      <div className="flex items-center mb-4">
+        <div className="w-10 h-10 bg-green-500 rounded-md mr-3 flex items-center justify-center">
+          <i className="fas fa-leaf text-white"></i>
+        </div>
+        <h1 className="text-xl font-semibold">FarmConnect Indore</h1>
+      </div>
+      
+      <div className="text-sm text-gray-400 mb-6 px-2">
+        Connecting local farmers with consumers in Indore
+      </div>
+      
+      <nav>
+        {navItems.map((item) => (
+          <div
+            key={item.id}
+            className={cn(
+              "flex items-center p-3 my-1 rounded-md cursor-pointer transition-all",
+              activeSection === item.id ? "bg-primary" : "hover:bg-white/10"
+            )}
+            onClick={() => handleNavClick(item.path)}
+          >
+            <i className={`${item.icon} mr-3`}></i>
+            <span>{item.title}</span>
+          </div>
+        ))}
+      </nav>
+      
+      <div className="mt-auto pt-6 border-t border-gray-700 text-xs text-gray-400">
+        <p>FarmConnect Indore Platform</p>
+        <p className="mt-1">Supporting Indore's local agriculture</p>
+      </div>
+    </aside>
+  );
+};
+
+export default Sidebar;
